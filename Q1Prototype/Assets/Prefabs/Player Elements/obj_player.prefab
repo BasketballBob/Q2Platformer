@@ -117,6 +117,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackObject: {fileID: 1176303758271044, guid: dc4187720de71924ba5bc2bf9cf0dc29,
     type: 2}
+  blockObject: {fileID: 0}
+  armObject: {fileID: 0}
 --- !u!114 &114652749896259696
 MonoBehaviour:
   m_ObjectHideFlags: 1

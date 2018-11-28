@@ -16,7 +16,8 @@ public class scr_playerAttack : MonoBehaviour {
 
     //Player Attack Variables 
     float hitDir;
-    Vector3 scale = new Vector3(2, .6f, 1);
+    //Vector3 scale = new Vector3(2, .6f, 1);
+    Vector3 scale = new Vector3(1, .6f, 1);
 
     //Define Componenet Variables
     private void OnEnable()
