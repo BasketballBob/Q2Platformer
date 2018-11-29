@@ -23,9 +23,9 @@ public class scr_eb_followAndAttacking : MonoBehaviour
 
     //Attacking Variables
     int attackAlarm = 0;
-    int attackTime = 40;
+    int attackTime = 120;
     int attackDuration = 6;
-    int attackWindUp = 40;
+    int attackWindUp = 20;
 
     //Dimensional Variables
     float enemyWidth;
@@ -67,8 +67,8 @@ public class scr_eb_followAndAttacking : MonoBehaviour
         if (active && !enemy.stunned && attackAlarm <= 0)
         {
             //Determine Movement Destination 
-            float moveDest = player.position.x - ((GetComponent<SpriteRenderer>().bounds.size.x/2 + 
-            player.gameObject.GetComponent<SpriteRenderer>().bounds.size.x/2 + moveBarrier) * pm.Sign(player.position.x - trans.position.x));
+            float moveDest = player.position.x - ((GetComponent<SpriteRenderer>().bounds.size.x / 2 +
+            player.gameObject.GetComponent<SpriteRenderer>().bounds.size.x / 2 + moveBarrier) * pm.Sign(player.position.x - trans.position.x));
 
             //Determine Movement Dir 
             moveDir = pm.Sign(moveDest - trans.position.x);
@@ -79,7 +79,7 @@ public class scr_eb_followAndAttacking : MonoBehaviour
                 po.hSpeed = moveSpeed * moveDir;
             }
             //Begin Attacking When At Destination (And On Ground)
-            else if(pm.PlaceMeeting(trans.position.x,trans.position.y-minMove,0))
+            else if (pm.PlaceMeeting(trans.position.x, trans.position.y - minMove, 0))
             {
                 po.hSpeed = 0;
                 attackAlarm = attackTime;
@@ -98,7 +98,7 @@ public class scr_eb_followAndAttacking : MonoBehaviour
 
 
         //Initiate Attack
-        if(active && !enemy.stunned && attackAlarm > 0)
+        if(active && !enemy.stunned && attackAlarm > (attackTime - (attackWindUp + attackDuration)))
         {
             //Freeze Enemy
             po.hSpeed = 0;
@@ -106,26 +106,37 @@ public class scr_eb_followAndAttacking : MonoBehaviour
             //Activate Attack Inst
             if(attackAlarm == attackTime)
             {
-                enemyAttack.SetActive(true);
-                enemyAttack.GetComponent<scr_enemyAttack>().ReactivateDamage();
+                //enemyAttack.SetActive(true);
+                //enemyAttack.GetComponent<scr_enemyAttack>().ReactivateDamage();
             }
         }
         //Deactivate Attack
-        else if(enemyAttack.activeSelf && attackAlarm <= 0)
+        else if(enemyAttack.activeSelf && attackAlarm <= (attackTime-(attackWindUp+attackDuration)))
         {
             enemyAttack.SetActive(false);
         }
 
-        //Countdown Attack Alarm
+        //Attack Timeline
         if(attackAlarm > 0)
         {
+            //Behavior Manager 
+            if(attackAlarm == attackTime - attackWindUp) //Activate Attack
+            {
+                enemyAttack.SetActive(true);
+                enemyAttack.GetComponent<scr_enemyAttack>().ReactivateDamage();
+            }
+            /*else if (attackAlarm == attackTime - (attackWindUp+attackDuration)) //Deactivate Attack
+            {
+                enemyAttack.SetActive(false);
+            }*/
+
+            //Countdown Alarm
             attackAlarm -= 1;
         }
 
         //Reset Behavior On Stun
         if(enemy.stunned)
         {
-
             attackAlarm = 0;
         }
     }

@@ -22,6 +22,8 @@ public class scr_player : MonoBehaviour {
     //playerAttack = Object.Instantiate(playerAttack, new Vector3(0,0,0), Quaternion.identity);
 
     //Player Variables
+    public int healthCap = 3;
+    public int health = 3;
     float alpha = 1f;
     public int hDir = 1;
     float moveSpeed = .09f; //.1f
@@ -38,8 +40,8 @@ public class scr_player : MonoBehaviour {
     int actionAlarm = 0;
     int attackDuration = 4;
     int attackTime = 40;
-    int blockDuration = 12;
-    int blockTime = 40;
+    int blockDuration = 60;
+    int blockTime = 60;
 
     //Player Damage Variables
     bool stunned = false;
@@ -99,8 +101,8 @@ public class scr_player : MonoBehaviour {
         bool down = Input.GetKey(KeyCode.DownArrow);
         bool right = Input.GetKey(KeyCode.RightArrow);
         bool left = Input.GetKey(KeyCode.LeftArrow);
-        bool attack = Input.GetKey(KeyCode.Z);
-        bool block = Input.GetKey(KeyCode.X);
+        bool attack = Input.GetKeyDown(KeyCode.Z);
+        bool block = Input.GetKeyDown(KeyCode.X);
 
         //Jumping 
         if (up && pm.PlaceMeeting(trans.position.x, trans.position.y - minMove, 0) && jumpAlarm <= 0 && !stunned)
@@ -161,14 +163,22 @@ public class scr_player : MonoBehaviour {
             playerAttack.transform.position = new Vector3(trans.position.x + hDir * (width/2 + aWidth/2), trans.position.y, trans.position.z);
         }
         //End Attack
-        else if (playerAttack.activeSelf && actionAlarm < attackTime - attackDuration)
+        else if (playerAttack.activeSelf && actionAlarm < attackTime - attackDuration || playerBlock.activeSelf && stunned)
         {
             //Deactivate Instance 
             playerAttack.SetActive(false);
         }
+        
+        //Acheive Parry
+        if (playerBlock.GetComponent<scr_playerBlock>().blocked)
+        {
+            Debug.Log("PARRIED!");
+            actionAlarm = 0; //Refresh Action So The Player May Counter Attack
+            playerBlock.GetComponent<scr_playerBlock>().blocked = false;
+        }
 
         //Initiate Block
-        if(block && !attack && actionAlarm <= 0 && !stunned)
+        if (block && actionAlarm <= 0 && !stunned) //&& !attack
         {
             //Reactivate Player Block
             actionAlarm = blockTime;
@@ -178,7 +188,7 @@ public class scr_player : MonoBehaviour {
             playerAttack.transform.position = new Vector3(trans.position.x + hDir * (width / 2 + bWidth / 2), trans.position.y, trans.position.z);
         }
         //End Block
-        else if(playerBlock.activeSelf && actionAlarm < blockTime - blockDuration)
+        else if(playerBlock.activeSelf && actionAlarm <= blockTime - blockDuration || playerBlock.activeSelf && stunned)
         {
             //Deactivate Instance
             playerBlock.SetActive(false);
@@ -260,6 +270,18 @@ public class scr_player : MonoBehaviour {
         {
 
         }
+
+        //Die Once Out Of Health
+        if(health <= 0)
+        {
+            //Destroy Player
+            Destroy(this.gameObject);
+
+            //Destroy Attached Objects
+            Destroy(armInst);
+            Destroy(playerAttack);
+            Destroy(playerBlock);
+        }
     }
 
     //POST PHYSICS OBJECT CALCULATIONS
@@ -316,6 +338,9 @@ public class scr_player : MonoBehaviour {
             //Give Player Knockback
             po.vSpeed = vKnockback;
             po.hSpeed = hKnockback * -hDir;
+
+            //Deduct Health
+            health -= 1;
         }
     }
 }
