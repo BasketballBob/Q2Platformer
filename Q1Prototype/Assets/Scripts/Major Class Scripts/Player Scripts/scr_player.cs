@@ -23,7 +23,7 @@ public class scr_player : MonoBehaviour {
 
     //Player Variables
     float alpha = 1f;
-    int hDir = 1;
+    public int hDir = 1;
     float moveSpeed = .09f; //.1f
     float jumpSpeed = .16f;
     int jumpAlarm = 0;
@@ -207,7 +207,7 @@ public class scr_player : MonoBehaviour {
         }
 
         //Player Get Damaged
-        if(pm.PlaceMeeting(trans.position.x,trans.position.y,2) && !invulnerable)
+        if(pm.PlaceMeeting(trans.position.x,trans.position.y,2))
         {
             takeDamage();
         }
@@ -291,7 +291,8 @@ public class scr_player : MonoBehaviour {
         armHeight = armInst.GetComponent<SpriteRenderer>().bounds.size.y;
         armInst.transform.position = new Vector3(trans.position.x + hDir * (width/2 + armWidth/2), trans.position.y, trans.position.z);
 
-        //Modify Additional Instance Scales (Scale of playerAttack is controlled within it's scripts)
+        //Modify Additional Instance Scales (Scale of playerAttack is controlled within it's scripts) 
+        //NOTE: THESE SCALES ARE RELATIVE TO THE OBJECTS SPRITE. MUST USE SAME SPRITE TO WORK PROPERLY.
         playerBlock.GetComponent<Transform>().localScale = new Vector3(trans.lossyScale.x, trans.lossyScale.y, trans.lossyScale.z);
         armInst.GetComponent<Transform>().localScale = new Vector3(trans.lossyScale.x, trans.lossyScale.y, trans.lossyScale.z);
 
@@ -299,18 +300,22 @@ public class scr_player : MonoBehaviour {
         armInst.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
     }
 
-    void takeDamage()
+    public void takeDamage()
     {
-        //Stun Player
-        stunned = true;
-        stunAlarm = stunTime;
+        //Only Damage If Not Invulnerable
+        if (!invulnerable)
+        {
+            //Stun Player
+            stunned = true;
+            stunAlarm = stunTime;
 
-        //Make Player Invulnerable
-        invulnerable = true;
-        invulnAlarm = invulnTime;
+            //Make Player Invulnerable
+            invulnerable = true;
+            invulnAlarm = invulnTime;
 
-        //Give Player Knockback
-        po.vSpeed = vKnockback;
-        po.hSpeed = hKnockback*-hDir;
+            //Give Player Knockback
+            po.vSpeed = vKnockback;
+            po.hSpeed = hKnockback * -hDir;
+        }
     }
 }

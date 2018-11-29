@@ -46,12 +46,12 @@ public class scr_placeMeeting : MonoBehaviour {
                 if(collideResults[i] != null)
                 {
                     //Check For Collision With Component
-                    //0 - Wall
+                    //0 - Wall / Platform
                     //1 - Player
                     //2 - Enemy
                     //3 - Player Attack
                     //4 - Enemy Attack
-                    //5 - Platform (1-way)
+                    //5 - Player Block
 
                     //Set Colliding Object To Variables
                     GameObject collidingObject = collideResults[i].gameObject;
@@ -84,6 +84,17 @@ public class scr_placeMeeting : MonoBehaviour {
                         break;
                     }
                     //Enemy Attack 
+                    else if (collisionType == 4 && collidingObject.GetComponent<scr_enemyAttack>() != null)
+                    {
+                        returnVal = true;
+                        break;
+                    }
+                    //Player Block 
+                    else if (collisionType == 5 && collidingObject.GetComponent<scr_playerBlock>() != null)
+                    {
+                        returnVal = true;
+                        break;
+                    }
 
                     //Platform
                     else if(collisionType == 0 && collidingObject.GetComponent<scr_platform>() != null

@@ -16,9 +16,24 @@ public class scr_eb_followAndAttacking : MonoBehaviour
     //Following Enemy Variables
     float minMove = scr_physicsObject.minMove;
     bool active = false;
-    float moveSpeed = .04f; //.05f
-    float jumpSpeed = .25f;
+    public float moveSpeed = .04f; //.05f
+    public float jumpSpeed = .25f;
     float moveDir = 1f;
+    public float moveBarrier = .5f; //Added Distance Between Player and Enemy
+
+    //Attacking Variables
+    int attackAlarm = 0;
+    int attackTime = 40;
+    int attackDuration = 6;
+    int attackWindUp = 40;
+
+    //Dimensional Variables
+    float enemyWidth;
+    float attackWidth;
+
+    //Enemy Attack Instance
+    public GameObject attackObject;
+    GameObject enemyAttack;
 
     //Define Component Variables
     private void OnEnable()
@@ -34,7 +49,8 @@ public class scr_eb_followAndAttacking : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        //Instantiate Enemy Attack
+        enemyAttack = Instantiate(attackObject, new Vector3(0, 0, 0), Quaternion.identity);
     }
 
     // Update is called once per frame
@@ -47,11 +63,10 @@ public class scr_eb_followAndAttacking : MonoBehaviour
             active = true;
         }
 
-        //Activated AI Behavior
-        if (active && !enemy.stunned)
+        //Walk Towards Player
+        if (active && !enemy.stunned && attackAlarm <= 0)
         {
             //Determine Movement Destination 
-            float moveBarrier = 2f; //Added Distance Between Player and Enemy
             float moveDest = player.position.x - ((GetComponent<SpriteRenderer>().bounds.size.x/2 + 
             player.gameObject.GetComponent<SpriteRenderer>().bounds.size.x/2 + moveBarrier) * pm.Sign(player.position.x - trans.position.x));
 
@@ -63,7 +78,12 @@ public class scr_eb_followAndAttacking : MonoBehaviour
             {
                 po.hSpeed = moveSpeed * moveDir;
             }
-            else po.hSpeed = 0;
+            //Begin Attacking When At Destination (And On Ground)
+            else if(pm.PlaceMeeting(trans.position.x,trans.position.y-minMove,0))
+            {
+                po.hSpeed = 0;
+                attackAlarm = attackTime;
+            }
 
             //Check If Obstacle Is In Path
             if (pm.PlaceMeeting(trans.position.x + minMove * moveDir, trans.position.y, 0))
@@ -74,6 +94,58 @@ public class scr_eb_followAndAttacking : MonoBehaviour
                     po.vSpeed = jumpSpeed;
                 }
             }
-        }//AI BEHAVIOR
+        }
+
+
+        //Initiate Attack
+        if(active && !enemy.stunned && attackAlarm > 0)
+        {
+            //Freeze Enemy
+            po.hSpeed = 0;
+            
+            //Activate Attack Inst
+            if(attackAlarm == attackTime)
+            {
+                enemyAttack.SetActive(true);
+                enemyAttack.GetComponent<scr_enemyAttack>().ReactivateDamage();
+            }
+        }
+        //Deactivate Attack
+        else if(enemyAttack.activeSelf && attackAlarm <= 0)
+        {
+            enemyAttack.SetActive(false);
+        }
+
+        //Countdown Attack Alarm
+        if(attackAlarm > 0)
+        {
+            attackAlarm -= 1;
+        }
+
+        //Reset Behavior On Stun
+        if(enemy.stunned)
+        {
+
+            attackAlarm = 0;
+        }
+    }
+
+    private void LateUpdate()
+    {
+        //Update Player Dimensions
+        enemyWidth = GetComponent<SpriteRenderer>().bounds.size.x;
+
+        //Manage Attack Object
+        if(enemyAttack.activeSelf)
+        {
+            //Update Attack Dimensions
+            attackWidth = enemyAttack.GetComponent<SpriteRenderer>().bounds.size.x;
+
+            //Manage Attack Position
+            enemyAttack.GetComponent<Transform>().position = new Vector3(trans.position.x + moveDir * (enemyWidth/2 + attackWidth/2) , trans.position.y, trans.position.z);
+
+            //Manage Scale Of Attack
+            enemyAttack.transform.localScale = trans.lossyScale;
+        }
     }
 }
