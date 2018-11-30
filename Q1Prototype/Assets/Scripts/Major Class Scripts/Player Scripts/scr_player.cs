@@ -49,7 +49,7 @@ public class scr_player : MonoBehaviour {
     float stunAlarm = 0;
     float stunTime = 20;
     float invulnAlarm = 0;
-    float invulnTime = 120;
+    float invulnTime = 80;
     float vKnockback = .2f;
     float hKnockback = .1f;
     float flickerMin = .5f;
@@ -172,7 +172,7 @@ public class scr_player : MonoBehaviour {
         //Acheive Parry
         if (playerBlock.GetComponent<scr_playerBlock>().blocked)
         {
-            Debug.Log("PARRIED!");
+            Debug.Log(trans.position.x);
             actionAlarm = 0; //Refresh Action So The Player May Counter Attack
             playerBlock.GetComponent<scr_playerBlock>().blocked = false;
         }
@@ -275,12 +275,16 @@ public class scr_player : MonoBehaviour {
         if(health <= 0)
         {
             //Destroy Player
-            Destroy(this.gameObject);
+            //Destroy(this.gameObject);
 
             //Destroy Attached Objects
-            Destroy(armInst);
-            Destroy(playerAttack);
-            Destroy(playerBlock);
+            //Destroy(armInst);
+            //Destroy(playerAttack);
+            //Destroy(playerBlock);
+
+            //Reset Scene
+            //SceneManager.LoadScene(SceneManager.GetActiveScene());
+            Application.LoadLevel(Application.loadedLevel);
         }
     }
 

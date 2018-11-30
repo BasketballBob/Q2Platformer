@@ -19,6 +19,7 @@ public class scr_eb_followAndAttacking : MonoBehaviour
     public float moveSpeed = .04f; //.05f
     public float jumpSpeed = .25f;
     float moveDir = 1f;
+    float attackDir = 1f;
     public float moveBarrier = .5f; //Added Distance Between Player and Enemy
 
     //Attacking Variables
@@ -72,6 +73,9 @@ public class scr_eb_followAndAttacking : MonoBehaviour
 
             //Determine Movement Dir 
             moveDir = pm.Sign(moveDest - trans.position.x);
+
+            //Attack Dir (Edgecase For Attacking
+            attackDir = pm.Sign(player.position.x - trans.position.x);
 
             //Move Towards Destination
             if (moveDir == pm.Sign(moveDest + moveSpeed - trans.position.x))
@@ -153,7 +157,7 @@ public class scr_eb_followAndAttacking : MonoBehaviour
             attackWidth = enemyAttack.GetComponent<SpriteRenderer>().bounds.size.x;
 
             //Manage Attack Position
-            enemyAttack.GetComponent<Transform>().position = new Vector3(trans.position.x + moveDir * (enemyWidth/2 + attackWidth/2) , trans.position.y, trans.position.z);
+            enemyAttack.GetComponent<Transform>().position = new Vector3(trans.position.x + attackDir * (enemyWidth/2 + attackWidth/2) , trans.position.y, trans.position.z);
 
             //Manage Scale Of Attack
             enemyAttack.transform.localScale = trans.lossyScale;
