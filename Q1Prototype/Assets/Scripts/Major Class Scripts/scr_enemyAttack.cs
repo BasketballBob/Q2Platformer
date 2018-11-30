@@ -30,8 +30,8 @@ public class scr_enemyAttack : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        Debug.Log(player.hDir);
-        Debug.Log(hDir);
+        //Debug.Log(player.hDir);
+        //Debug.Log(hDir);
         //Pacify If Blocked (BLOCKING DIRECTION DETERMINED BY PLAYER DIRECTION NOT BLOCK DIRECTION)
         if(damaging && pm.PlaceMeeting(trans.position.x,trans.position.y,5) && player.hDir == -hDir)
         {

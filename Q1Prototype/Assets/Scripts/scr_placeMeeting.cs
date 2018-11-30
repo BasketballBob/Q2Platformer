@@ -64,6 +64,14 @@ public class scr_placeMeeting : MonoBehaviour {
                         returnVal = true;
                         break;
                     }
+                    //Platform
+                    else if (collisionType == 0 && collidingObject.GetComponent<scr_platform>() != null
+                    && prevPos.y - gameObject.GetComponent<SpriteRenderer>().bounds.size.y / 2
+                    > collidingObject.GetComponent<Transform>().position.y + collidingObject.GetComponent<SpriteRenderer>().bounds.size.y / 2)
+                    { //COLLISION ONLY WORKS IF THE SPRITE PIVOT IS PERFECTLY CENTERED
+                        returnVal = true;
+                        break;
+                    }
                     //Player
                     else if (collisionType == 1 && collidingObject.GetComponent<scr_player>() != null)
                     {
@@ -92,15 +100,6 @@ public class scr_placeMeeting : MonoBehaviour {
                     //Player Block 
                     else if (collisionType == 5 && collidingObject.GetComponent<scr_playerBlock>() != null)
                     {
-                        returnVal = true;
-                        break;
-                    }
-
-                    //Platform
-                    else if(collisionType == 0 && collidingObject.GetComponent<scr_platform>() != null
-                    && gameObject.GetComponent<Transform>().position.y-gameObject.GetComponent<BoxCollider2D>().size.y/2 
-                    > collidingObject.GetComponent<Transform>().position.y+collidingObject.GetComponent<BoxCollider2D>().size.y/2)
-                    { //COLLISION ONLY WORKS IF THE SPRITE PIVOT IS PERFECTLY CENTERED
                         returnVal = true;
                         break;
                     }
