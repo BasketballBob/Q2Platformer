@@ -8,11 +8,12 @@ public class scr_enemyAttack : MonoBehaviour {
     Transform trans;
     scr_placeMeeting pm;
     scr_player player;
+    Transform enemyParent;
 
     //Enemy Attack Variables
     bool damaging = true;
-    int hDir = 1;
-
+    float hDir = 1;
+   
 
     //Initialize Reference Vars
     private void OnEnable()
@@ -31,15 +32,19 @@ public class scr_enemyAttack : MonoBehaviour {
 	void Update ()
     {
         //Debug.Log(player.hDir);
-        //Debug.Log(hDir);
+        //Debug.Log(pm.Sign(hDir));
         //Pacify If Blocked (BLOCKING DIRECTION DETERMINED BY PLAYER DIRECTION NOT BLOCK DIRECTION)
         if(damaging && pm.PlaceMeeting(trans.position.x,trans.position.y,5) && player.hDir == -hDir)
         {
+            //Pacify Attack
             damaging = false;
+
+            //Show Player Has Blocked Attack
+            player.block();
         }
 
-		//Damage If Damaging
-        else if(damaging && pm.PlaceMeeting(trans.position.x,trans.position.y,1))
+        //Damage If Damaging
+        else if (damaging && pm.PlaceMeeting(trans.position.x, trans.position.y, 1))
         {
             //Debug.Log("Damage Outputting");
 
@@ -48,11 +53,18 @@ public class scr_enemyAttack : MonoBehaviour {
 
             //Pacify Attack
             damaging = false;
+
+
         }
 	}
 
     public void ReactivateDamage()
     {
         damaging = true;
+    }
+
+    public void UpdateHDir(float dir)
+    {
+        hDir = dir;
     }
 }

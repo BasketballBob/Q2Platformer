@@ -21,6 +21,14 @@ public class scr_player : MonoBehaviour {
     //GameObject playerAttack;
     //playerAttack = Object.Instantiate(playerAttack, new Vector3(0,0,0), Quaternion.identity);
 
+    //Developer Command Variables
+    bool superMobility = false;
+    float sMoveSpeed = .12f; //(Super)
+    float sJumpSpeed = .20f;
+    float dMoveSpeed;        //(Default)
+    float dJumpSpeed;
+    bool devInvuln = false;
+
     //Player Variables
     public int healthCap = 3;
     public int health = 3;
@@ -42,6 +50,7 @@ public class scr_player : MonoBehaviour {
     int attackTime = 40;
     int blockDuration = 60;
     int blockTime = 60;
+    bool blocked = false;
 
     //Player Damage Variables
     bool stunned = false;
@@ -85,10 +94,39 @@ public class scr_player : MonoBehaviour {
 
         //Create Player Arm Inst
         armInst = Instantiate(armObject, new Vector3(0, 0, 0), Quaternion.identity);
+
+        //Set Defualt Speed Variables (FOR TOGGLING SUPER-MOBILITY)
+        dMoveSpeed = moveSpeed;
+        dJumpSpeed = jumpSpeed;
     }
 	
 	// Update is called once per frame
 	void Update () {
+
+        //DEVELOPER COMMANDS
+        if(Input.GetKey(KeyCode.R))//Restart Room (Scene)
+        {
+            Application.LoadLevel(Application.loadedLevel);
+        }
+        if(Input.GetKeyDown(KeyCode.T))//Toggle Super-Mobility
+        {
+            superMobility = !superMobility;
+        }
+        if(superMobility) //Super
+        {
+            moveSpeed = sMoveSpeed;
+            jumpSpeed = sJumpSpeed;
+        }
+        else              //Default
+        {
+            moveSpeed = dMoveSpeed;
+            jumpSpeed = dJumpSpeed;
+        }
+        //Toggle Invincibility 
+        if(Input.GetKeyDown(KeyCode.I))
+        {
+            devInvuln = !devInvuln;
+        }
 
         //TEST: Set Player Opacity
         //sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, .5f);
@@ -163,18 +201,18 @@ public class scr_player : MonoBehaviour {
             playerAttack.transform.position = new Vector3(trans.position.x + hDir * (width/2 + aWidth/2), trans.position.y, trans.position.z);
         }
         //End Attack
-        else if (playerAttack.activeSelf && actionAlarm < attackTime - attackDuration || playerBlock.activeSelf && stunned)
+        else if (playerAttack.activeSelf && actionAlarm <= attackTime - attackDuration || playerBlock.activeSelf && stunned)
         {
             //Deactivate Instance 
             playerAttack.SetActive(false);
         }
         
         //Acheive Parry
-        if (playerBlock.GetComponent<scr_playerBlock>().blocked)
+        if (blocked && !stunned)
         {
-            Debug.Log(trans.position.x);
+            //Debug.Log(trans.position.x);
             actionAlarm = 0; //Refresh Action So The Player May Counter Attack
-            playerBlock.GetComponent<scr_playerBlock>().blocked = false;
+            blocked = false; //NOTE: BLOCKED VARIABLE IS SET BY ENEMY ATTACK
         }
 
         //Initiate Block
@@ -329,7 +367,7 @@ public class scr_player : MonoBehaviour {
     public void takeDamage()
     {
         //Only Damage If Not Invulnerable
-        if (!invulnerable)
+        if (!invulnerable && !devInvuln)
         {
             //Stun Player
             stunned = true;
@@ -347,4 +385,10 @@ public class scr_player : MonoBehaviour {
             health -= 1;
         }
     }
+
+    public void block()
+    {
+        blocked = true;
+    }
 }
+

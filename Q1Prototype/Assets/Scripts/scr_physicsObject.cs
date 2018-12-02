@@ -12,6 +12,7 @@ public class scr_physicsObject : MonoBehaviour {
     scr_placeMeeting pm;
 
     //Modifiable Variables
+    [SerializeField] bool colorChange = false;
     public bool gravEnabled = true;
 
     //Physics Object Variables
@@ -97,7 +98,10 @@ public class scr_physicsObject : MonoBehaviour {
         }
 
         //Test Collision Color
-        if (pm.PlaceMeeting(trans.position.x, trans.position.y, 0)) sr.color = new Color(255, 0, 0, sr.color.a); //Red
-        else sr.color = new Color(0, 255, 0, sr.color.a); //.color = new Color(100, 255, 100, sr.color.a);       
+        if (colorChange)
+        {
+            if (pm.PlaceMeeting(trans.position.x, trans.position.y, 0)) sr.color = new Color(255, 0, 0, sr.color.a); //Red
+            else sr.color = new Color(0, 255, 0, sr.color.a); //.color = new Color(100, 255, 100, sr.color.a);       
+        }
     }
 }

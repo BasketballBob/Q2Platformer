@@ -60,46 +60,51 @@ public class scr_playerAttack : MonoBehaviour {
                     //Check If Collision Instance Is An Enemy
                     if(collideList[i].gameObject.GetComponent<scr_enemy>() != null)
                     {
-                        //Check If Instance Has Already Been Registered 
-                        for (int p = 0; p < usedCollideList.Length;p++)
-                        {
-                            if(collideList[i] == usedCollideList[p])
-                            {
-                               /*Debug.Log("COMPARISON");
-                                Debug.Log(collideList[i]);
-                                Debug.Log(usedCollideList[p]);*/
-                                instRegistered = true;
-                                break;
-                            } 
-                        }
-
-                        //Register Instance If Not Registered Already
-                        if(!instRegistered)
-                        {
+                        //Check If Enemy Is Alive
+                        if(collideList[i].gameObject.GetComponent<scr_enemy>().dead == false)
+                        { 
+                            //Check If Instance Has Already Been Registered 
                             for (int p = 0; p < usedCollideList.Length;p++)
                             {
-                                //Check For First Null Instance To Register
-                                if(usedCollideList[p] == null)
+                                if(collideList[i] == usedCollideList[p])
                                 {
-                                    //Register Collision 
-                                    usedCollideList[p] = collideList[i];
-
-                                    //Determine Hit Direction
-                                    //if (!sr.flipX) hitDir = 1;
-                                    //else hitDir = -1;
-
-                                    //Determine Hit Direction From Player Relation (EDGECASE GLITCH ON FIRST FRAME)
-                                    if (trans.position.x > player.position.x) hitDir = 1;
-                                    else if (trans.position.x < player.position.x) hitDir = -1;
-
-                                    //INTERACT WITH ENEMY
-                                    scr_enemy hitEnemy = collideList[i].GetComponent<scr_enemy>();
-                                    hitEnemy.GetHit(hitDir); //Calls Method Built In Enemy
-
-                                    //Debug.Log("Enemy Hit From Player Attack");
-
-                                    //Break
+                                    /*Debug.Log("COMPARISON");
+                                    Debug.Log(collideList[i]);
+                                    Debug.Log(usedCollideList[p]);*/
+                                    instRegistered = true;
                                     break;
+                                } 
+                            }
+
+                            //Register Instance If Not Registered Already
+                            if(!instRegistered)
+                            {
+                                for (int p = 0; p < usedCollideList.Length;p++)
+                                {
+                                    //Check For First Null Instance To Register
+                                    if(usedCollideList[p] == null)
+                                    {
+                                        //Register Collision 
+                                        usedCollideList[p] = collideList[i];
+
+                                        //Determine Hit Direction
+                                        //if (!sr.flipX) hitDir = 1;
+                                        //else hitDir = -1;
+
+                                        //Determine Hit Direction From Player Relation (EDGECASE GLITCH ON FIRST FRAME)
+                                        if (trans.position.x > player.position.x) hitDir = 1;
+                                        else if (trans.position.x < player.position.x) hitDir = -1;
+
+                                        //INTERACT WITH ENEMY
+                                        scr_enemy hitEnemy = collideList[i].GetComponent<scr_enemy>();
+                                        hitEnemy.GetHit(hitDir); //Calls Method Built In Enemy
+                                        //Debug.Log(hitEnemy);
+
+                                        //Debug.Log("Enemy Hit From Player Attack");
+
+                                        //Break
+                                        break;
+                                    }
                                 }
                             }
                         }

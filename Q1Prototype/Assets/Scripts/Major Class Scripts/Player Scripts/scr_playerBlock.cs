@@ -31,10 +31,10 @@ public class scr_playerBlock : MonoBehaviour {
 
         //Determine Block Direction From Player Relation (FINISH LATER)
 
-        //Determine If An Attack Has Been Blocked
-        if (pm.PlaceMeeting(trans.position.x, trans.position.y, 4) && !blocked)
+        //Determine If An Attack Has Been Blocked (NOW DETERMINED THROUGH ENEMY ATTACK)
+        /*if (pm.PlaceMeeting(trans.position.x, trans.position.y, 4) && !blocked)
         {
             blocked = true;
-        }
+        }*/
 	}
 }
