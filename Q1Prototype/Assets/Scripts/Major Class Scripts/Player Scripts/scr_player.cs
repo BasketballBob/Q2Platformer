@@ -151,7 +151,7 @@ public class scr_player : MonoBehaviour {
         }
 
         //Extended Jump
-        if (up && eJumpAlarm > 0)
+        if (up && eJumpAlarm > 0 && !pm.PlaceMeeting(trans.position.x,trans.position.y+minMove,0))
         {
             po.vSpeed = jumpSpeed;
             eJumpAlarm -= 1;

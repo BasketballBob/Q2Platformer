@@ -4,23 +4,30 @@ using UnityEngine;
 
 public class scr_crab : scr_animationManager {
 
-  
+
     //Crab Sprite Vars
-    Sprite sprites;
+    Sprite crabSprite;
 
     // Use this for initialization
     void Start () {
-        //sprites = Resources.LoadAll<Sprite>("spr_crab_0","spr_crab_1");
+        crabSprite = sr.sprite;
+        //sprites = crabSprite.//Resources.LoadAll<Sprite>("spr_testCrab");
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
         //Airborn 
-        if (spriteX != 0)
+        if (!pm.PlaceMeeting(trans.position.x, trans.position.y - minMove, 0))
         {
-
+            //x1 = 0;
+            //x2 = 3;
+            //animSpeed = 5;
+            //animDir = 1;
         }
+
+        //GetComponent<SpriteRenderer>().sprite = sprites[0];
+        //Debug.Log(sprites.Length);
 
 	}
 }

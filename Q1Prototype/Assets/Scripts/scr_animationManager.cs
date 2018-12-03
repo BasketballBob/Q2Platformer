@@ -5,17 +5,21 @@ using UnityEngine;
 public class scr_animationManager : MonoBehaviour {
 
     //Component References
-    Transform trans;
-    SpriteRenderer sr;
-    scr_placeMeeting pm;
+    protected Transform trans;
+    protected SpriteRenderer sr;
+    protected scr_placeMeeting pm;
+    protected float minMove = scr_physicsObject.minMove;
 
     //Animation Manager Vars
-    int animSpeed = 2;
+    protected int animSpeed = 2;
     int animAlarm;
-    int animDir = 1; 
+    protected int animDir = 1; 
     protected int spriteX; //Current Sprite
-    int x1; //Start Of Animation
-    int x2; //End Of Animation
+    protected int x1; //Start Of Animation
+    protected int x2; //End Of Animation
+
+    //Inserted Sprite List
+    protected Sprite[] sprites;
 
     //Define Reference Vars
     private void OnEnable()
@@ -55,7 +59,7 @@ public class scr_animationManager : MonoBehaviour {
         }
 
         //Set Sprite Value
-        //sr.sprite = spr_crab; // "spr_crab_" + spriteX.ToString();
+        sr.sprite = sprites[spriteX];
 
     }
 }
