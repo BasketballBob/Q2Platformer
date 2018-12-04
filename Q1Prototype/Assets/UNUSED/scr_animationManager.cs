@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -60,6 +61,8 @@ public class scr_animationManager : MonoBehaviour {
 
         //Set Sprite Value
         sr.sprite = sprites[spriteX];
+
+
 
     }
 }

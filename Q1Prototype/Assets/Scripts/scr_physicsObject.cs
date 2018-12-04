@@ -17,6 +17,8 @@ public class scr_physicsObject : MonoBehaviour {
 
     //Physics Object Variables
     public static float minMove = .001f;
+    public float xPrev;
+    public float yPrev;
     float maxVSpeed = 2f;
     public static float grav = .015f; //.005f;
     public float vSpeed;
@@ -41,6 +43,10 @@ public class scr_physicsObject : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        //Set last Position Variables
+        xPrev = trans.position.x;
+        yPrev = trans.position.y;
+
         //Gravity
         if (gravEnabled && !pm.PlaceMeeting(trans.position.x, trans.position.y - minMove, 0))
         {
