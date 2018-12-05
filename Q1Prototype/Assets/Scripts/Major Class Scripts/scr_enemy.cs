@@ -12,6 +12,7 @@ public class scr_enemy : MonoBehaviour {
 
     //Enemy Variables
     float minMove = scr_physicsObject.minMove;
+    int drawLayer = 0;
     int hDir;
 
     //Modifiable Enemy Variables
@@ -40,7 +41,7 @@ public class scr_enemy : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-
+        sr.sortingOrder = drawLayer;
 	}
 	
 	// Update is called once per frame

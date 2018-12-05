@@ -7,6 +7,7 @@ public class scr_player : MonoBehaviour {
     //Component Variables
     Transform trans;
     SpriteRenderer sr;
+    Animator anim;
     scr_placeMeeting pm;
     scr_physicsObject po;
 
@@ -17,6 +18,7 @@ public class scr_player : MonoBehaviour {
     GameObject playerBlock;
     public GameObject armObject;
     GameObject armInst;
+    Animator armAnim;
 
     //GameObject playerAttack;
     //playerAttack = Object.Instantiate(playerAttack, new Vector3(0,0,0), Quaternion.identity);
@@ -43,8 +45,13 @@ public class scr_player : MonoBehaviour {
     //float width = 
     //float height = 
 
+    //Player Arm Variables
+    float armXOff = -.21f;
+    float armYOff = -.025f;
+
     //Player Attack/Block Variables
     //float attackOffSet = 1.25f;
+    bool attacking = false; //Edgecase Var To Distinguish Between Actions Of Blocking and Attacking (relative to actionAlarm)
     int actionAlarm = 0;
     int attackDuration = 4;
     int attackTime = 40;
@@ -59,6 +66,8 @@ public class scr_player : MonoBehaviour {
     float stunTime = 20;
     float invulnAlarm = 0;
     float invulnTime = 80;
+    float blockInvulnTime = 20;
+    bool blockInvuln = false; //Ensures player doesn't flicker 
     float vKnockback = .2f;
     float hKnockback = .1f;
     float flickerMin = .5f;
@@ -81,6 +90,7 @@ public class scr_player : MonoBehaviour {
     {
         trans = GetComponent<Transform>();
         sr = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
         pm = GetComponent<scr_placeMeeting>();
         po = GetComponent<scr_physicsObject>();
     }
@@ -98,6 +108,9 @@ public class scr_player : MonoBehaviour {
         //Set Defualt Speed Variables (FOR TOGGLING SUPER-MOBILITY)
         dMoveSpeed = moveSpeed;
         dJumpSpeed = jumpSpeed;
+
+        //Define Arm Animator
+        armAnim = armInst.GetComponent<Animator>();
     }
 	
 	// Update is called once per frame
@@ -199,6 +212,9 @@ public class scr_player : MonoBehaviour {
 
             //Set Proper Position To Ensure Proper Collision (MAKE SURE CODE IS EQUIVALENT TO THAT IN THE LATEUPDATE FUNCTION)
             playerAttack.transform.position = new Vector3(trans.position.x + hDir * (width/2 + aWidth/2), trans.position.y, trans.position.z);
+
+            //Show That Attack Action Has Begun
+            attacking = true;
         }
         //End Attack
         else if (playerAttack.activeSelf && actionAlarm <= attackTime - attackDuration || playerBlock.activeSelf && stunned)
@@ -237,6 +253,7 @@ public class scr_player : MonoBehaviour {
         {
             actionAlarm -= 1;
         }
+        else attacking = false; //Edgecase: (Check in variable initilization for description)
 
         //Manage Sprite Flipping
         if (hDir == 1) //RIGHT
@@ -264,7 +281,11 @@ public class scr_player : MonoBehaviour {
         if (pm.PlaceMeeting(trans.position.x, trans.position.y - minMove, 0))
         {
             if (stunAlarm > 0) stunAlarm -= 1;
-            else if (stunAlarm <= 0) stunned = false;
+            else if (stunAlarm <= 0)
+            {
+                blockInvuln = false;
+                stunned = false;
+            }
         }
         //Debug.Log(stunned);
         //Debug.Log(invulnerable);
@@ -283,7 +304,7 @@ public class scr_player : MonoBehaviour {
         }
 
         //MANAGER PLAYER OPACITY
-        if (invulnerable)
+        if (invulnerable && !blockInvuln)
         {
             //Two Way Flickering
             if (alpha + flickerDir * flickerRate > flickerMax)
@@ -302,11 +323,49 @@ public class scr_player : MonoBehaviour {
 
         //Set Player's Alpha
         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+        SpriteRenderer armSR = armInst.GetComponent<SpriteRenderer>();
+        armSR.color = new Color(armSR.color.r, armSR.color.g, armSR.color.b, alpha);
 
         //Arm Animation Manager
-        if(armInst.activeSelf)
+        //Blocking
+        if (playerBlock.activeSelf || blockInvuln)
         {
+            armAnim.Play("anim_playerArm_block");
+        }
+        //Attacking
+        else if (attacking) //!stunned && actionAlarm > 0)
+        {
+            //Get Progress Info Of Animation 
+            //AnimatorStateInfo armAnimStateInfo = armAnim.GetCurrentAnimatorStateInfo(0);
+            //AnimatorClipInfo[] armAnimClipInfo = armAnim.GetCurrentAnimatorClipInfo(0);
+            //float animTime = armAnimClipInfo[0].length * armAnimStateInfo.normalizedTime;
 
+            //["anim_playerArm_attack"].wrapMode = WrapMode.Once;
+
+            armAnim.Play("anim_playerArm_attack");  
+        }
+        //Idle
+        else
+        {
+            armAnim.Play("anim_playerArm_idle");
+        }
+
+        //Torso Animation Manager
+        //Midair
+        if(!pm.PlaceMeeting(trans.position.x,trans.position.y-minMove,0))
+        {
+            anim.Play("anim_playerTorso_midair");
+        }
+        //Walking
+        else if(po.xPrev != trans.position.x)
+        {
+            anim.Play("anim_playerTorso_walking");
+        }
+        //Idle
+        else
+        {
+            anim.Play("anim_playerTorso_idle");
+            
         }
 
         //Die Once Out Of Health
@@ -353,7 +412,7 @@ public class scr_player : MonoBehaviour {
         //Manage Player Arm Instance
         armWidth = armInst.GetComponent<SpriteRenderer>().bounds.size.x;
         armHeight = armInst.GetComponent<SpriteRenderer>().bounds.size.y;
-        armInst.transform.position = new Vector3(trans.position.x + hDir * (width/2 + armWidth/2), trans.position.y, trans.position.z);
+        armInst.transform.position = new Vector3(trans.position.x + hDir * (width/2 + armWidth/2 + armXOff), trans.position.y + armYOff, trans.position.z);
 
         //Modify Additional Instance Scales (Scale of playerAttack is controlled within it's scripts) 
         //NOTE: THESE SCALES ARE RELATIVE TO THE OBJECTS SPRITE. MUST USE SAME SPRITE TO WORK PROPERLY.
@@ -361,7 +420,9 @@ public class scr_player : MonoBehaviour {
         armInst.GetComponent<Transform>().localScale = new Vector3(trans.lossyScale.x, trans.lossyScale.y, trans.lossyScale.z);
 
         //DEBUGGING Set Player Arm Opacity (Color is changed as well)
-        armInst.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
+        //armInst.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
+        blockObject.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
+        attackObject.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
     }
 
     public void takeDamage()
@@ -369,20 +430,47 @@ public class scr_player : MonoBehaviour {
         //Only Damage If Not Invulnerable
         if (!invulnerable && !devInvuln)
         {
-            //Stun Player
-            stunned = true;
-            stunAlarm = stunTime;
 
-            //Make Player Invulnerable
-            invulnerable = true;
-            invulnAlarm = invulnTime;
+            //Player Blocking Knockback (Direct Enemy Contact)
+            if(playerBlock.activeSelf)
+            {
+                //Stun Player
+                stunned = true;
+                stunAlarm = stunTime;
 
-            //Give Player Knockback
-            po.vSpeed = vKnockback;
-            po.hSpeed = hKnockback * -hDir;
+                //Give Player Knockback
+                po.vSpeed = vKnockback;
+                po.hSpeed = hKnockback * -hDir;
 
-            //Deduct Health
-            health -= 1;
+                //Make Player Invulnerable
+                invulnerable = true;
+                invulnAlarm = invulnTime*(1/2);
+
+                //Toggle BlockInvuln 
+                blockInvuln = true;
+            }
+            //Normal Damage Reception
+            else
+            {
+                //Stun Player
+                stunned = true;
+                stunAlarm = stunTime;
+
+                //Give Player Knockback
+                po.vSpeed = vKnockback;
+                po.hSpeed = hKnockback * -hDir;
+
+                //Make Player Invulnerable
+                invulnerable = true;
+                invulnAlarm = invulnTime;
+
+                //Toggle BlockInvuln 
+                blockInvuln = false;
+
+                //Deduct Health
+                health -= 1;
+            }      
+            
         }
     }
 

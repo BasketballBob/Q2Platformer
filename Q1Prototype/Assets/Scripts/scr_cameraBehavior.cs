@@ -21,6 +21,7 @@ public class scr_cameraBehavior : MonoBehaviour {
     //Background Variables
     public Sprite bgImage;
     GameObject bgObject;
+    public Color bgColor;
     float bgScale = 6f;
     int bgLayer = -2;
 
@@ -51,6 +52,7 @@ public class scr_cameraBehavior : MonoBehaviour {
         bgObject.GetComponent<SpriteRenderer>().sprite = bgImage;
         bgObject.GetComponent<Transform>().localScale = new Vector3(bgScale, bgScale, bgScale);
         bgObject.GetComponent<SpriteRenderer>().sortingOrder = bgLayer;
+        bgObject.GetComponent<SpriteRenderer>().color = bgColor;
 
         //Create Healthbar
         healthObject = new GameObject();
@@ -88,9 +90,9 @@ public class scr_cameraBehavior : MonoBehaviour {
         {
             //Manage Background
             float bgWidth = bgObject.GetComponent<SpriteRenderer>().bounds.size.x;
-            float bgWidthPortion = .55f; //(Edgecase Variable For When Edge Of Background is Visible)
+            float bgWidthPortion = .48f; //(Edgecase Variable For When Edge Of Background is Visible)
             float bgX1 = x1 + Mathf.Abs(bgWidth * bgWidthPortion - width / 2); //bgWidth /2 
-            float bgX2 = x2 - Mathf.Abs(bgWidth / 2 - width / 2); //bgWidth / 2
+            float bgX2 = x2 - Mathf.Abs(bgWidth * bgWidthPortion - width / 2); //bgWidth / 2
             float backgroundX = bgX1 + (bgX2 - bgX1) * ((trans.position.x - x1) / (x2 - x1));
             bgObject.GetComponent<Transform>().position = new Vector2(backgroundX, trans.position.y);
         }
